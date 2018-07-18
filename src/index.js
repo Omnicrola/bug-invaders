@@ -1,8 +1,9 @@
-function component() {
-    var element = document.createElement('div');
+import GameEngine from "./core/GameEngine";
 
-    element.innerHTML = 'HELLO';
-    return element;
-}
-
-document.body.appendChild(component());
+const gameConfig = {
+    fps: 30,
+    canvasId: 'game-canvas',
+    subsystems: []
+};
+const gameEngine = new GameEngine(gameConfig);
+gameEngine.start();
