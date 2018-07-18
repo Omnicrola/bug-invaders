@@ -1,0 +1,14 @@
+{
+  "name": "bug-invaders",
+  "version": "1.0.0",
+  "scripts":{
+    "build" : "./node_modules/.bin/webpack --config webpack.config.js"
+  },
+  "author":"Eric Schreffler",
+
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^4.16.1",
+    "webpack-cli": "^3.0.8"
+  }
+}
