@@ -96,7 +96,52 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CanvasRenderer; });
-class CanvasRenderer{}
+class CanvasRenderer {
+
+    constructor(canvasContext) {
+        this._canvasContext = canvasContext;
+        this._color = '#FFFFFF';
+        this._font = '12px monospace';
+        this._canvasContext.fillStyle = this._color;
+        this._canvasContext.strokeStyle = this._color;
+        this._canvasContext.font = this._font;
+    }
+
+    setColor(newColor) {
+        this._color = newColor;
+    }
+
+    setFont(newFont) {
+        this._font = newFont;
+    }
+
+    drawText(x, y, text) {
+        this._canvasContext.fillStyle = this._color;
+        this._canvasContext.font = this._font;
+        this._canvasContext.fillText(text, x, y);
+    }
+
+    fillRectangle(x, y, w, h) {
+        this._canvasContext.fillStyle = this._color;
+        this._canvasContext.fillRect(x, y, w, h);
+    }
+
+    drawLine(x1, y1, x2, y2) {
+        this._canvasContext.strokeStyle = this._color;
+        this._canvasContext.beginPath();
+        this._canvasContext.moveTo(x1, y1);
+        this._canvasContext.lineTo(x2, y2);
+        this._canvasContext.stroke();
+
+    }
+
+    clearCanvas(color) {
+        this._canvasContext.fillStyle = color;
+        const w = this._canvasContext.canvas.width;
+        const h = this._canvasContext.canvas.height;
+        this._canvasContext.fillRect(0, 0, w, h);
+    }
+}
 
 /***/ }),
 
@@ -138,7 +183,45 @@ class Delta {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return EventBus; });
-class EventBus {}
+class EventBus {
+    constructor() {
+        this._pendingEvents = [];
+        this._subscribers = {};
+    };
+
+    enqueue(event) {
+        this._pendingEvents.push(event);
+    }
+
+    subscribe(eventType, subscriber) {
+        if (!this._subscribers[eventType]) {
+            this._subscribers[eventType] = [];
+        }
+        this._subscribers[eventType].push(subscriber);
+    }
+
+    unsubscribe(eventType, subscriberToRemove) {
+        const subscribers = this._subscribers[eventType];
+        const indexOf = subscribers.indexOf(subscriberToRemove);
+        if (indexOf !== -1) {
+            subscribers.splice(indexOf, 1);
+        }
+    }
+
+    process() {
+        const self = this;
+        const allEvents = this._pendingEvents;
+        this._pendingEvents = [];
+        allEvents.forEach((event) => {
+            const subscribers = self._subscribers[event.type];
+            if (subscribers) {
+                subscribers.forEach((subscriber) => {
+                    subscriber(event);
+                });
+            }
+        });
+    }
+}
 
 /***/ }),
 
@@ -179,7 +262,9 @@ class GameEngine {
 
     cycle() {
         const interval = this._delta.getInterval();
-        console.log('Cycle : ' + interval.delta);
+        this._renderer.clearCanvas('#000000');
+        this._renderer.setColor('#FFFFFF');
+        this._renderer.drawText(100, 100, 'Hello!');
     }
 
     static _createDelta(config) {
@@ -213,7 +298,40 @@ class GameEngine {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GameInput; });
-class GameInput{}
+class GameInput {
+
+    constructor() {
+        const LEFT = 37;
+        const UP = 38;
+        const RIGHT = 39;
+        const DOWN = 40;
+        const SPACEBAR = 32;
+        this._keyStates = new Array(255).map(i => false);
+        this.blockedKeys = [LEFT, RIGHT, UP, DOWN, SPACEBAR];
+        document.addEventListener('keyup', this._keyUp.bind(this));
+        document.addEventListener('keydown', this._keyDown.bind(this));
+    }
+
+    isPressed(keyCode) {
+        return this._keyStates[keyCode];
+    }
+
+    _keyUp(event) {
+        this._keyStates[event.keyCode] = false;
+        this._supressGameKeys(event);
+    }
+
+    _keyDown(event) {
+        this._keyStates[event.keyCode] = true;
+        this._supressGameKeys(event);
+    }
+
+    _supressGameKeys(event) {
+        if (this.blockedKeys.indexOf(event.keyCode) !== -1) {
+            event.preventDefault();
+        }
+    }
+}
 
 /***/ }),
 

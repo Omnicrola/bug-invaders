@@ -21,7 +21,9 @@ export default class GameEngine {
 
     cycle() {
         const interval = this._delta.getInterval();
-        console.log('Cycle : ' + interval.delta);
+        this._renderer.clearCanvas('#000000');
+        this._renderer.setColor('#FFFFFF');
+        this._renderer.drawText(100, 100, 'Hello!');
     }
 
     static _createDelta(config) {
