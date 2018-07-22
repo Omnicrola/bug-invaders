@@ -1,13 +1,17 @@
+import {autobind, loadArray} from "../Util";
+
+export const KEY_LEFT = 37;
+export const KEY_UP = 38;
+export const KEY_RIGHT = 39;
+export const KEY_DOWN = 40;
+export const KEY_SPACEBAR = 32;
+
 export default class GameInput {
 
     constructor() {
-        const LEFT = 37;
-        const UP = 38;
-        const RIGHT = 39;
-        const DOWN = 40;
-        const SPACEBAR = 32;
-        this._keyStates = new Array(255).map(i => false);
-        this.blockedKeys = [LEFT, RIGHT, UP, DOWN, SPACEBAR];
+        autobind(GameInput.prototype, this);
+        this._keyStates = loadArray(255, false);
+        this.blockedKeys = [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_SPACEBAR];
         document.addEventListener('keyup', this._keyUp.bind(this));
         document.addEventListener('keydown', this._keyDown.bind(this));
     }
